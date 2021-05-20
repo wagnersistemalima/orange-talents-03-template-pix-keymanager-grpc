@@ -42,6 +42,7 @@ dependencies {
 
     // validação
     implementation("io.micronaut.beanvalidation:micronaut-hibernate-validator")
+    implementation("org.hibernate.validator:hibernate-validator:6.0.0.Final")
 
     // banco postgres
     implementation("org.postgresql:postgresql:42.2.20")

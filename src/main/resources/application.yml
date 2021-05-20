@@ -8,7 +8,7 @@ grpc:
 
 datasources:
   default:
-    url: jdbc:postgresql://localhost:5432/bd_cdc
+    url: jdbc:postgresql://localhost:5432/bd_keymanager
     driverClassName: org.postgresql.Driver
     username: postgres
     password: 1234567
