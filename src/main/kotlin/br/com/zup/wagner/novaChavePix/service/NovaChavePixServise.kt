@@ -1,6 +1,6 @@
 package br.com.zup.wagner.novaChavePix.service
 
-import br.com.zup.wagner.novaChavePix.exceptions.ErrorHandlle
+
 import br.com.zup.wagner.novaChavePix.model.ContaAssociada
 import br.com.zup.wagner.novaChavePix.exceptions.NovaChavePixException
 import br.com.zup.wagner.novaChavePix.model.ChavePix
