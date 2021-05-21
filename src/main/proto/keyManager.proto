@@ -7,8 +7,16 @@ option objc_class_prefix = "HLW";
 
 package br.com.zup.wagner;
 
+// service 1
 service KeyManagerRegistraChavePixService {
-  rpc registra (RegistraChavePixRequest) returns (RegistraChavePixResponse) {}
+  rpc registra (RegistraChavePixRequest) returns (RegistraChavePixResponse) {} // 1
+
+}
+
+// service 2
+
+service KeyManagerRemoveChavePixService {
+  rpc delete (DeleteChavePixRequest) returns (DeleteChavePixResponse) {} // 2
 }
 
 enum TipoDeChave {
@@ -26,7 +34,7 @@ enum  TipoDeConta {
   CONTA_POUPANCA = 2;
 
 }
-// estrutura de dados de entrada
+// estrutura de dados de entrada / end point cadastrar
 message RegistraChavePixRequest {
   string clientId = 1;
   TipoDeChave tipoDeChave = 2;
@@ -35,8 +43,20 @@ message RegistraChavePixRequest {
 
 
 }
-// estrutura de dados de saida
+// estrutura de dados de saida / end pint cadastrar
 message RegistraChavePixResponse {
   string clientId =1;
   string pixId = 2;
+}
+
+// estrutura de dados de entrada / end point delete
+message  DeleteChavePixRequest {
+  string pixId = 1;
+  string identificadorItau = 2;
+
+}
+// estrutura de dados de saida / end point delete
+message  DeleteChavePixResponse {
+  string pixId = 1;
+  string identificadorItau = 2;
 }

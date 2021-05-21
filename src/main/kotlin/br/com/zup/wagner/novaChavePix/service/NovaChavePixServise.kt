@@ -38,7 +38,7 @@ class NovaChavePixServise(
         if (repository.existsByChave(novaChavePixRequest.valorChave)) {
             logger.info("Entrando na exceção, chave pix existente")
 
-            throw NovaChavePixException("Chave pix ${novaChavePixRequest.valorChave} existente")
+            throw NovaChavePixException()
 
         }
 

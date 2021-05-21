@@ -29,9 +29,10 @@ class ExceptionHandllerInterceptor: MethodInterceptor<NovaChavePixServise, Any?>
             // convertendo exceçoes para erro GRPC
             val error = when(e) {
                 is IllegalArgumentException -> Status.INVALID_ARGUMENT.withDescription(e.message).asRuntimeException()
-                is IllegalStateException -> Status.FAILED_PRECONDITION.withDescription(e.message).asRuntimeException()
-                is NovaChavePixException -> Status.ALREADY_EXISTS.withDescription(e.message).asRuntimeException()
+                is IllegalStateException -> Status.FAILED_PRECONDITION.withDescription(e.message).asRuntimeException() // esxeção no RP itau
+                is NovaChavePixException -> Status.ALREADY_EXISTS.withDescription(e.msg).asRuntimeException()
                 is ConstraintViolationException -> Status.INVALID_ARGUMENT.withDescription(e.message).asRuntimeException()
+                is RemoveChavePixException -> Status.NOT_FOUND.withDescription(e.msg).asRuntimeException()
                 //else -> Status.UNKNOWN.withDescription("Erro Inesperado").asRuntimeException()
                 else -> throw e
             }
