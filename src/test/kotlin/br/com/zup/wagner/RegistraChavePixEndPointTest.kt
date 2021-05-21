@@ -23,6 +23,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Named
 
 // lateinit = propriedade precisará ser inicializada assim que possível
 
@@ -41,7 +42,6 @@ class RegistraChavePixEndPointTest(
 
     val identificadorItau = UUID.randomUUID()
     val tipoDeConta = TipoDeContaModel.CONTA_CORRENTE
-    val tipoDeChave = TipoDeChaveModel.CPF
     val valorChave = "02467781054"                     //cpf
     val valorChaveCelular = "+5583993809934"          // celular
     val valorChaveEmail = "rafael@gmail.com"
@@ -69,20 +69,18 @@ class RegistraChavePixEndPointTest(
             br.com.zup.wagner.novaChavePix.servicoExterno.TitularResponse(id = id, nome = nomeTitular, cpf = cpf)
         )
 
-    // fabrica de servidor grpc--------------------------------------------------------------
-
-    @Factory
-    class Client { // Grpc client
-        @Bean
-        fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel): KeyManagerRegistraChavePixServiceGrpc.KeyManagerRegistraChavePixServiceBlockingStub {
-            return KeyManagerRegistraChavePixServiceGrpc.newBlockingStub(channel)
-        }
-    }
 
     // rodar antes de cada teste ------------------------------------------------------
 
     @BeforeEach
     fun setUp() {
+
+    }
+
+    // rodar depois de cada teste
+
+    @AfterEach
+    fun tearDown() {
         repository.deleteAll()
     }
 
