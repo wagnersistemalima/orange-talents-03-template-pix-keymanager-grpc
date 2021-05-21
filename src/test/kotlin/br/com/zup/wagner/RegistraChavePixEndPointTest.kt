@@ -267,6 +267,58 @@ class RegistraChavePixEndPointTest(
 
     }
 
+    // 7 cenario / deve inserir dados e registrar chave pix aleatoria
+
+    @Test
+    @DisplayName("Deve cadastrar dados e registrar chave pix aleatoria")
+    fun deveCadastrarChavePixAleatoria() {
+
+        // cenario
+
+        `when` (apiItauClient.consulta(clientId = Mockito.anyString(), tipo = Mockito.anyString()))
+            .thenReturn(HttpResponse.ok(dadosDaContaItauResponse))
+
+        //açao
+
+        val response = grpcClient.registra(RegistraChavePixRequest.newBuilder()
+            .setClientId(identificadorItau.toString())
+            .setTipoDeChave(TipoDeChave.ALEATORIA)
+            .setValorChave("")
+            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
+            .build())
+
+        // assertivas
+
+        assertNotNull(valorChaveAleatoria)
+    }
+
+    // 8 cenario / nao deve cadastrar chave pix aleatoria, quando o valor da chave for preenchido
+
+    @Test
+    @DisplayName("Nao deve cadastrar chave pix aleatoria quando o valor da chave for preenchido")
+    fun NaodeveCadastrarChavePixAleatoriaQuandoOvalorDaChaveForPreenchido() {
+
+        // cenario
+
+        `when` (apiItauClient.consulta(clientId = Mockito.anyString(), tipo = Mockito.anyString()))
+            .thenReturn(HttpResponse.ok(dadosDaContaItauResponse))
+
+        //açao
+
+        val response = assertThrows<StatusRuntimeException> {
+            grpcClient.registra(RegistraChavePixRequest.newBuilder()
+                .setClientId(identificadorItau.toString())
+                .setTipoDeChave(TipoDeChave.ALEATORIA)
+                .setValorChave("04394450438")
+                .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
+                .build())
+        }
+
+        // assertivas
+
+        assertEquals(Status.INVALID_ARGUMENT.code, response.status.code)
+    }
+
 }
 
 
