@@ -5,6 +5,8 @@ import br.com.zup.wagner.novaChavePix.model.ContaAssociada
 import br.com.zup.wagner.novaChavePix.model.TipoDeChaveModel
 import br.com.zup.wagner.novaChavePix.model.TipoDeContaModel
 import br.com.zup.wagner.novaChavePix.repository.ChavePixRepository
+import br.com.zup.wagner.novaChavePix.servicoExterno.bcp.BancoCentralBrasil
+import br.com.zup.wagner.novaChavePix.servicoExterno.bcp.DeletePixKeyRequest
 import io.grpc.ManagedChannel
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -12,9 +14,12 @@ import io.micronaut.context.annotation.Bean
 import io.micronaut.context.annotation.Factory
 import io.micronaut.grpc.annotation.GrpcChannel
 import io.micronaut.grpc.server.GrpcServerChannel
+import io.micronaut.http.HttpResponse
+import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.mockito.Mockito
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
@@ -27,6 +32,9 @@ class RemoveChavePixEndPointTest(
 
     lateinit var CHAVE_PIX_EXISTENTE: ChavePix
 
+    @Inject
+    lateinit var apiBancoCentralBrasilClient: BancoCentralBrasil
+
     val identificadorItau = UUID.randomUUID()
     val identificadorItauInvalido = "c56dfef4-7901-44fb-84e2-a2cefb1"
     val identificadorItauOutraPessoa = "5260263c-a3c1-4727-ae32-3bdb2538841b"
@@ -37,6 +45,7 @@ class RemoveChavePixEndPointTest(
     val idNaoExiste = UUID.randomUUID()
     val nomeTitular = "Rafael M C Ponte"
     val cpf = "02467781054"     // cpf do Rafael Pontes
+    val ispb = "60701190"
 
     // rodar antes de cada teste
 
@@ -49,6 +58,7 @@ class RemoveChavePixEndPointTest(
             tipoDeConta = TipoDeContaModel.CONTA_CORRENTE,
             conta = ContaAssociada(
                 instituicao = instituicao,
+                ispb = ispb,
                 agencia = agencia,
                 numeroConta = numeroConta,
                 titular = nomeTitular,
@@ -67,6 +77,13 @@ class RemoveChavePixEndPointTest(
         repository.deleteAll()
     }
 
+    // mockando Banco central client
+
+    @MockBean(BancoCentralBrasil::class)
+    fun apiBancoCentralBrasilClient(): BancoCentralBrasil {
+        return Mockito.mock(BancoCentralBrasil::class.java)
+    }
+
     // 1 cenario de teste / deve remover uma chave pix existente------------------------------------
 
     @Test
@@ -74,6 +91,10 @@ class RemoveChavePixEndPointTest(
     fun deveRemoverChavePixExistente() {
 
         // cenario
+
+        // comportamento banco central
+        Mockito.`when`(apiBancoCentralBrasilClient.delete(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(HttpResponse.ok())
 
         // ação
 
@@ -97,6 +118,10 @@ class RemoveChavePixEndPointTest(
 
         // cenario
 
+        // comportamento banco central
+        Mockito.`when`(apiBancoCentralBrasilClient.delete(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(HttpResponse.badRequest())
+
         // ação
 
         val response = assertThrows<StatusRuntimeException> {
@@ -119,6 +144,10 @@ class RemoveChavePixEndPointTest(
     fun deveLançarExceptionInvalidArgument() {
 
         // cenario
+
+        // comportamento banco central
+        Mockito.`when`(apiBancoCentralBrasilClient.delete(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(HttpResponse.badRequest())
 
         // ação
 
@@ -144,6 +173,10 @@ class RemoveChavePixEndPointTest(
 
         // cenario
 
+        // comportamento banco central
+        Mockito.`when`(apiBancoCentralBrasilClient.delete(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(HttpResponse.badRequest())
+
         // ação
 
         val response = assertThrows<StatusRuntimeException> {
@@ -166,6 +199,10 @@ class RemoveChavePixEndPointTest(
     fun deveSubirExceptionAoTentarRemoverChavePixExistenteMasComIdentificadorItauDeOutraPessoa() {
 
         // cenario
+
+        // comportamento banco central
+        Mockito.`when`(apiBancoCentralBrasilClient.delete(Mockito.anyString(), MockitoHelper.anyObject()))
+            .thenReturn(HttpResponse.badRequest())
 
         // ação
 

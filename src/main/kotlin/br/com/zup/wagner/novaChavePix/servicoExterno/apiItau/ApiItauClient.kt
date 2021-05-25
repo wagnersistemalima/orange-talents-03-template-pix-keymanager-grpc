@@ -1,4 +1,4 @@
-package br.com.zup.wagner.novaChavePix.servicoExterno
+package br.com.zup.wagner.novaChavePix.servicoExterno.apiItau
 
 
 import io.micronaut.http.HttpResponse

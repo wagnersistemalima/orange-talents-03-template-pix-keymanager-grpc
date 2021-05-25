@@ -5,6 +5,7 @@ import javax.persistence.Embeddable
 @Embeddable
 class ContaAssociada(
     val instituicao: String,
+    val ispb: String,
     val agencia: String,
     val numeroConta: String,
     val titular: String,

@@ -22,7 +22,7 @@ class ChavePix(
 
     @field:NotBlank
     @field:Column(unique = true, nullable = false)
-    val chave: String,
+    var chave: String,
 
     @field:NotNull
     @field:Enumerated(EnumType.STRING)
@@ -41,5 +41,11 @@ class ChavePix(
 
     @Column(nullable = false)
     val criadoEm: LocalDateTime = LocalDateTime.now()
+
+    // metodo para atualizar o valor da chave pix
+
+    fun atualizaChave(key: String) {
+        this.chave = key
+    }
 
 }

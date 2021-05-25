@@ -10,7 +10,10 @@ import br.com.zup.wagner.novaChavePix.repository.ChavePixRepository
 
 
 import br.com.zup.wagner.novaChavePix.request.NovaChavePixRequest
-import br.com.zup.wagner.novaChavePix.servicoExterno.ApiItauClient
+import br.com.zup.wagner.novaChavePix.servicoExterno.apiItau.ApiItauClient
+import br.com.zup.wagner.novaChavePix.servicoExterno.bcp.BancoCentralBrasil
+import br.com.zup.wagner.novaChavePix.servicoExterno.bcp.CreatePixKeyRequest
+import io.micronaut.http.HttpStatus
 import io.micronaut.validation.Validated
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
@@ -23,7 +26,8 @@ import javax.validation.Valid
 @Singleton
 class NovaChavePixServise(
     @Inject val apiItauClient: ApiItauClient,
-    @Inject val repository: ChavePixRepository
+    @Inject val repository: ChavePixRepository,
+    @Inject val apiBancoCentral: BancoCentralBrasil
 ) {
 
     private val logger = LoggerFactory.getLogger(NovaChavePixServise::class.java)
@@ -52,9 +56,25 @@ class NovaChavePixServise(
 
         // 3 grava no banco de dados
         val chave = novaChavePixRequest.toModel(contaAssociada)
+
         repository.save(chave)
         logger.info("Salvando registro no banco")
-        return chave
+
+        // 4 registrar chave no banco central
+
+        val bancoCentralRequest = CreatePixKeyRequest(chave)
+
+        try {
+            val respostaBancoCentral = apiBancoCentral.creat(bancoCentralRequest)
+            chave.atualizaChave(respostaBancoCentral.body()!!.key)
+
+            return chave
+        }
+        catch (e: Exception) {
+            throw IllegalArgumentException("Erro ao cadastrar pix no Banco Central")
+        }
+
+
     }
 
 

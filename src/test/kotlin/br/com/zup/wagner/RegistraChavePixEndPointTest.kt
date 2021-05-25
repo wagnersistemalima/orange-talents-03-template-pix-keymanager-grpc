@@ -5,14 +5,13 @@ import br.com.zup.wagner.novaChavePix.model.ContaAssociada
 import br.com.zup.wagner.novaChavePix.model.TipoDeChaveModel
 import br.com.zup.wagner.novaChavePix.model.TipoDeContaModel
 import br.com.zup.wagner.novaChavePix.repository.ChavePixRepository
-import br.com.zup.wagner.novaChavePix.servicoExterno.ApiItauClient
-import io.grpc.ManagedChannel
+import br.com.zup.wagner.novaChavePix.servicoExterno.apiItau.InstituicaoResponse
+import br.com.zup.wagner.novaChavePix.servicoExterno.apiItau.TitularResponse
+import br.com.zup.wagner.novaChavePix.servicoExterno.apiItau.ApiItauClient
+import br.com.zup.wagner.novaChavePix.servicoExterno.apiItau.DadosDaContaResponse
+import br.com.zup.wagner.novaChavePix.servicoExterno.bcp.*
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
-import io.micronaut.context.annotation.Bean
-import io.micronaut.context.annotation.Factory
-import io.micronaut.grpc.annotation.GrpcChannel
-import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.annotation.MockBean
@@ -21,9 +20,9 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Named
 
 // lateinit = propriedade precisará ser inicializada assim que possível
 
@@ -39,7 +38,10 @@ class RegistraChavePixEndPointTest(
     @Inject
     lateinit var apiItauClient: ApiItauClient
 
+    @Inject
+    lateinit var apiBancoCentralBrasilClient: BancoCentralBrasil
 
+    val keyAleatorio = UUID.randomUUID().toString()
     val identificadorItau = UUID.randomUUID()
     val tipoDeConta = TipoDeContaModel.CONTA_CORRENTE
     val valorChave = "02467781054"                     //cpf
@@ -60,14 +62,20 @@ class RegistraChavePixEndPointTest(
         return Mockito.mock(ApiItauClient::class.java)
     }
 
-    val dadosDaContaItauResponse = br.com.zup.wagner.novaChavePix.servicoExterno
-        .DadosDaContaResponse(
+    @MockBean(BancoCentralBrasil::class)
+    fun apiBancoCentralBrasilClient(): BancoCentralBrasil {
+        return Mockito.mock(BancoCentralBrasil::class.java)
+    }
+
+    val dadosDaContaItauResponse = DadosDaContaResponse(
             tipo = tipoDeConta.toString(),
-            br.com.zup.wagner.novaChavePix.servicoExterno.InstituicaoResponse(nome = instituicao, ispb = ispb),
+            InstituicaoResponse(nome = instituicao, ispb = ispb),
             agencia = agencia,
             numero = numeroConta,
-            br.com.zup.wagner.novaChavePix.servicoExterno.TitularResponse(id = id, nome = nomeTitular, cpf = cpf)
+            TitularResponse(id = id, nome = nomeTitular, cpf = cpf)
         )
+
+
 
 
     // rodar antes de cada teste ------------------------------------------------------
@@ -90,10 +98,49 @@ class RegistraChavePixEndPointTest(
     @DisplayName("Deve inserir dados da chave pix no banco")
     fun deveGerarChavePixCpf() {
 
-        // cenario, comportamento api itau
+        // cenario,
+
+        val createPixKeyRequest = CreatePixKeyRequest(
+            key = valorChave,
+            keyType = PixkeyType.CPF,
+            bankAccount = BankAccount(
+                participant = ispb,
+                branch = agencia,
+                accountNumber = numeroConta,
+                accountType = AccountType.CACC,),
+            owner = Owner(
+                type = OwnerType.NATURAL_PERSON,
+                name = nomeTitular,
+                taxIdNumber = cpf
+            )
+
+        )
+
+        val createPixKeyResponse = CreatePixKeyResponse(
+            keyType = PixkeyType.CPF,
+            key = cpf,
+            bankAccount = BankAccount(
+                participant = ispb,
+                branch = agencia,
+                accountNumber = numeroConta,
+                accountType = AccountType.CACC),
+            owner = Owner(
+                type = OwnerType.NATURAL_PERSON,
+                name = nomeTitular,
+                taxIdNumber = cpf),
+            createdAt = LocalDateTime.now()
+        )
+
+
+        // comportamento api itau
 
         `when`(apiItauClient.consulta(Mockito.anyString(), tipo = Mockito.anyString()))
             .thenReturn(HttpResponse.ok(dadosDaContaItauResponse))
+
+        // comportamento banco central
+        `when` (apiBancoCentralBrasilClient.creat(createPixKeyRequest))
+            .thenReturn(HttpResponse.created(createPixKeyResponse))
+
 
 
         // ação serviço Bloom Grpc envia dados para o end point
@@ -121,8 +168,45 @@ class RegistraChavePixEndPointTest(
 
         // cenario
 
+        val createPixKeyRequest = CreatePixKeyRequest(
+            key = valorChaveCelular,
+            keyType = PixkeyType.PHONE,
+            bankAccount = BankAccount(
+                participant = ispb,
+                branch = agencia,
+                accountNumber = numeroConta,
+                accountType = AccountType.CACC,),
+            owner = Owner(
+                type = OwnerType.NATURAL_PERSON,
+                name = nomeTitular,
+                taxIdNumber = cpf
+            )
+
+        )
+
+        val createPixKeyResponse = CreatePixKeyResponse(
+            keyType = PixkeyType.PHONE,
+            key = valorChaveCelular,
+            bankAccount = BankAccount(
+                participant = ispb,
+                branch = agencia,
+                accountNumber = numeroConta,
+                accountType = AccountType.CACC),
+            owner = Owner(
+                type = OwnerType.NATURAL_PERSON,
+                name = nomeTitular,
+                taxIdNumber = cpf),
+            createdAt = LocalDateTime.now()
+        )
+
+        // comportamento itau
+
         `when`(apiItauClient.consulta(clientId = Mockito.anyString(), tipo = Mockito.anyString()))
             .thenReturn(HttpResponse.ok(dadosDaContaItauResponse))
+
+//        // comportamento banco central
+        `when` (apiBancoCentralBrasilClient.creat(createPixKeyRequest))
+            .thenReturn(HttpResponse.created(createPixKeyResponse))
 
         // ação  ação serviço Bloom Grpc envia dados para o end point
 
@@ -150,8 +234,45 @@ class RegistraChavePixEndPointTest(
 
         // cenario
 
+        val createPixKeyRequest = CreatePixKeyRequest(
+            key = valorChaveEmail,
+            keyType = PixkeyType.EMAIL,
+            bankAccount = BankAccount(
+                participant = ispb,
+                branch = agencia,
+                accountNumber = numeroConta,
+                accountType = AccountType.CACC,),
+            owner = Owner(
+                type = OwnerType.NATURAL_PERSON,
+                name = nomeTitular,
+                taxIdNumber = cpf
+            )
+
+        )
+
+        val createPixKeyResponse = CreatePixKeyResponse(
+            keyType = PixkeyType.EMAIL,
+            key = valorChaveEmail,
+            bankAccount = BankAccount(
+                participant = ispb,
+                branch = agencia,
+                accountNumber = numeroConta,
+                accountType = AccountType.CACC),
+            owner = Owner(
+                type = OwnerType.NATURAL_PERSON,
+                name = nomeTitular,
+                taxIdNumber = cpf),
+            createdAt = LocalDateTime.now()
+        )
+
+        // comportamento itau
+
         `when`(apiItauClient.consulta(clientId = Mockito.anyString(), tipo = Mockito.anyString()))
             .thenReturn(HttpResponse.ok(dadosDaContaItauResponse))
+
+        // comportamento banco central
+        `when` (apiBancoCentralBrasilClient.creat(createPixKeyRequest))
+            .thenReturn(HttpResponse.created(createPixKeyResponse))
 
         // ação
 
@@ -211,6 +332,7 @@ class RegistraChavePixEndPointTest(
                 tipoDeConta = TipoDeContaModel.CONTA_CORRENTE,
                 ContaAssociada(
                     instituicao = instituicao,
+                    ispb = ispb,
                     agencia = agencia,
                     numeroConta = numeroConta,
                     titular = nomeTitular,
@@ -273,8 +395,44 @@ class RegistraChavePixEndPointTest(
 
         // cenario
 
+        val createPixKeyRequest = CreatePixKeyRequest(
+            key = keyAleatorio,
+            keyType = PixkeyType.RANDOM,
+            bankAccount = BankAccount(
+                participant = ispb,
+                branch = agencia,
+                accountNumber = numeroConta,
+                accountType = AccountType.CACC,),
+            owner = Owner(
+                type = OwnerType.NATURAL_PERSON,
+                name = nomeTitular,
+                taxIdNumber = cpf
+            )
+
+        )
+
+        val createPixKeyResponse = CreatePixKeyResponse(
+            keyType = PixkeyType.RANDOM,
+            key = keyAleatorio,
+            bankAccount = BankAccount(
+                participant = ispb,
+                branch = agencia,
+                accountNumber = numeroConta,
+                accountType = AccountType.CACC),
+            owner = Owner(
+                type = OwnerType.NATURAL_PERSON,
+                name = nomeTitular,
+                taxIdNumber = cpf),
+            createdAt = LocalDateTime.now()
+        )
+        // comportamento itau
+
         `when` (apiItauClient.consulta(clientId = Mockito.anyString(), tipo = Mockito.anyString()))
             .thenReturn(HttpResponse.ok(dadosDaContaItauResponse))
+
+        // comportamento banco central
+        `when` (apiBancoCentralBrasilClient.creat(MockitoHelper.anyObject()))
+            .thenReturn(HttpResponse.created(createPixKeyResponse))
 
         //açao
 
@@ -287,7 +445,7 @@ class RegistraChavePixEndPointTest(
 
         // assertivas
 
-        assertNotNull(valorChaveAleatoria)
+        assertNotNull(keyAleatorio)
     }
 
     // 8 cenario / nao deve cadastrar chave pix aleatoria, quando o valor da chave for preenchido
@@ -300,6 +458,56 @@ class RegistraChavePixEndPointTest(
 
         `when` (apiItauClient.consulta(clientId = Mockito.anyString(), tipo = Mockito.anyString()))
             .thenReturn(HttpResponse.ok(dadosDaContaItauResponse))
+
+        //açao
+
+
+        val response = assertThrows<StatusRuntimeException> {
+            grpcClient.registra(RegistraChavePixRequest.newBuilder()
+                .setClientId(identificadorItau.toString())
+                .setTipoDeChave(TipoDeChave.ALEATORIA)
+                .setValorChave("04394450438")
+                .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
+                .build())
+        }
+
+        // assertivas
+
+        assertEquals(Status.INVALID_ARGUMENT.code, response.status.code)
+    }
+
+    // 9 cenario / nao deve cadastrar chave pix quando não for possivel cadastrar chave banco central
+
+    @Test
+    @DisplayName("nao deve cadastrar chave pix quando não for possivel cadastrar chave banco central")
+    fun naoDeveCadastrarChaveQuandoNaoRegistrarNoBancoCentral() {
+
+        // cenario
+
+        val createPixKeyRequest = CreatePixKeyRequest(
+            key = valorChave,
+            keyType = PixkeyType.CPF,
+            bankAccount = BankAccount(
+                participant = ispb,
+                branch = agencia,
+                accountNumber = numeroConta,
+                accountType = AccountType.CACC,),
+            owner = Owner(
+                type = OwnerType.NATURAL_PERSON,
+                name = nomeTitular,
+                taxIdNumber = cpf
+            )
+
+        )
+
+        // comportamento itau
+
+        `when` (apiItauClient.consulta(clientId = Mockito.anyString(), tipo = Mockito.anyString()))
+            .thenReturn(HttpResponse.ok(dadosDaContaItauResponse))
+
+        // comportamento banco central
+        `when` (apiBancoCentralBrasilClient.creat(createPixKeyRequest))
+            .thenReturn(HttpResponse.badRequest())
 
         //açao
 

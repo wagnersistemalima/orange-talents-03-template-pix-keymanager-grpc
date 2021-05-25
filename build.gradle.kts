@@ -60,6 +60,9 @@ dependencies {
     testImplementation("org.mockito:mockito-core:3.8.0")
     testImplementation("io.micronaut.test:micronaut-test-junit5:2.3.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+
+    // xml
+    implementation("io.micronaut.xml:micronaut-jackson-xml")
     
 }
 
