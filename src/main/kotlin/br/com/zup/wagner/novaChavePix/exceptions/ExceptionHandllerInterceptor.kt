@@ -33,6 +33,7 @@ class ExceptionHandllerInterceptor: MethodInterceptor<NovaChavePixServise, Any?>
                 is NovaChavePixException -> Status.ALREADY_EXISTS.withDescription(e.msg).asRuntimeException()
                 is ConstraintViolationException -> Status.INVALID_ARGUMENT.withDescription(e.message).asRuntimeException()
                 is RemoveChavePixException -> Status.NOT_FOUND.withDescription(e.msg).asRuntimeException()
+                is ChavePixException -> Status.NOT_FOUND.withDescription(e.msg).asRuntimeException()
                 //else -> Status.UNKNOWN.withDescription("Erro Inesperado").asRuntimeException()
                 else -> throw e
             }

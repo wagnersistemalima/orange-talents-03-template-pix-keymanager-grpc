@@ -23,6 +23,14 @@ interface BancoCentralBrasil {
     @Produces(MediaType.APPLICATION_XML)
     fun delete(@PathVariable key: String, @Body deletePixKeyRequest: DeletePixKeyRequest): HttpResponse<DeletePixKeyResponse>
 
+    // end point consulta banco central
+
+    @Get("/api/v1/pix/keys/{key}")
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
+    fun consulta(@PathVariable key: String): HttpResponse<PixKeyDetailsResponse>
+
+
 
 
 }

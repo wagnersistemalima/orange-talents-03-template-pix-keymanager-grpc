@@ -4,6 +4,7 @@ option java_multiple_files = true;
 option java_package = "br.com.zup.wagner";
 option java_outer_classname = "KeyManager";
 option objc_class_prefix = "HLW";
+import "google/protobuf/timestamp.proto";     // trabalhar com datas e hora
 
 package br.com.zup.wagner;
 
@@ -17,6 +18,12 @@ service KeyManagerRegistraChavePixService {
 
 service KeyManagerRemoveChavePixService {
   rpc delete (DeleteChavePixRequest) returns (DeleteChavePixResponse) {} // 2
+}
+
+// service 3
+
+service  KeyManagerCarregaChavePixService {
+  rpc carrega (CarregaChavePixRequest) returns (CarregaChavePixResponse) {}
 }
 
 enum TipoDeChave {
@@ -60,3 +67,35 @@ message  DeleteChavePixResponse {
   string pixId = 1;
   string identificadorItau = 2;
 }
+
+// estrutura de dados do serviço 3 / end point carrega
+
+message CarregaChavePixRequest{
+
+  message  FiltroPorPixId {
+    string clientId = 1;
+    string pixId = 2;
+  }
+  FiltroPorPixId pixId = 1;
+  string chave = 2;
+}
+
+// estrutura de dados do serviço 3 / end point carrega
+
+message CarregaChavePixResponse {
+  string identificadorItau = 1;
+  string tipoDeChave = 2;
+  string chave = 3;
+  string instituicao = 4;
+  string ispb = 5;
+  string agencia = 6;
+  string numeroConta = 7;
+  string titular = 8;
+  string cpf = 9;
+  string idInterno = 10;
+  string criadoEm = 11;
+
+}
+
+
+
