@@ -40,6 +40,7 @@ class CarregaDadosChavePixEndPoint(
             .setIdentificadorItau(chaveResponse?.identificadorItau)
             .setTipoDeChave(chaveResponse?.tipoChave)
             .setChave(chaveResponse!!.chave)
+            .setTipoDeConta(chaveResponse.tipoDeConta)
             .setInstituicao(chaveResponse?.instituicao)
             .setIspb(chaveResponse!!.ispb)
             .setAgencia(chaveResponse!!.agencia)

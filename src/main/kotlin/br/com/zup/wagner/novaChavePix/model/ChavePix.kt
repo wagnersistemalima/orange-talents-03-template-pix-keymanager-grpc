@@ -48,5 +48,9 @@ class ChavePix(
         this.chave = key
     }
 
+    override fun toString(): String {
+        return "ChavePix(identificadorItau=$identificadorItau, tipoChave=$tipoChave, chave='$chave', tipoDeConta=$tipoDeConta, conta=$conta, id=$id, criadoEm=$criadoEm)"
+    }
+
 
 }

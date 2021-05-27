@@ -34,9 +34,27 @@ class ConsultaChavePixService(
 
             val possivelChavePix = repository.findByChave(key)
 
-            // trabalhando aqui
+            logger.info("possivel chave = $possivelChavePix")
 
-            if (possivelChavePix == null) {
+            if (possivelChavePix != null) {
+                val chaveResponse: DadosChavePixResponse = DadosChavePixResponse(
+                    id = possivelChavePix!!.id.toString(),
+                    identificadorItau = possivelChavePix.identificadorItau.toString(),
+                    tipoChave = possivelChavePix.tipoChave.toString(),
+                    chave = possivelChavePix.chave,
+                    tipoDeConta = possivelChavePix.tipoDeConta.toString(),
+                    instituicao = possivelChavePix.conta.instituicao,
+                    ispb = possivelChavePix.conta.ispb,
+                    agencia = possivelChavePix.conta.agencia,
+                    numeroConta = possivelChavePix.conta.numeroConta,
+                    titular = possivelChavePix.conta.titular,
+                    cpf = possivelChavePix.conta.cpf,
+                    criadoEm = possivelChavePix.criadoEm.toString()
+                )
+                return chaveResponse
+            }
+
+            else if (possivelChavePix == null) {
 
 
                 try {

@@ -86,14 +86,15 @@ message CarregaChavePixResponse {
   string identificadorItau = 1;
   string tipoDeChave = 2;
   string chave = 3;
-  string instituicao = 4;
-  string ispb = 5;
-  string agencia = 6;
-  string numeroConta = 7;
-  string titular = 8;
-  string cpf = 9;
-  string idInterno = 10;
-  string criadoEm = 11;
+  string tipoDeConta = 4;
+  string instituicao = 5;
+  string ispb = 6;
+  string agencia = 7;
+  string numeroConta = 8;
+  string titular = 9;
+  string cpf = 10;
+  string idInterno = 11;
+  string criadoEm = 12;
 
 }
 
