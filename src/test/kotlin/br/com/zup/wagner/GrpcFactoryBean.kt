@@ -31,4 +31,11 @@ class GrpcFactoryBean {
     fun consultaChaveStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel): KeyManagerCarregaChavePixServiceGrpc.KeyManagerCarregaChavePixServiceBlockingStub {
         return KeyManagerCarregaChavePixServiceGrpc.newBlockingStub(channel)
     }
+
+    // 4 bean para testes listar todas as chaves pix
+
+    @Bean
+    fun listarTodasChaveStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel): KeyManagerCarregaTodasChavePixServiceGrpc.KeyManagerCarregaTodasChavePixServiceBlockingStub {
+        return KeyManagerCarregaTodasChavePixServiceGrpc.newBlockingStub(channel)
+    }
 }
