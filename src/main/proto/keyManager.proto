@@ -26,6 +26,15 @@ service  KeyManagerCarregaChavePixService {
   rpc carrega (CarregaChavePixRequest) returns (CarregaChavePixResponse) {}
 }
 
+// service 4
+
+service KeyManagerCarregaTodasChavePixService {
+  rpc listarTodas (ListarTodasPixRequest) returns (ListarTodasPixResponse) {
+
+  }
+}
+
+// estrutura de dados service 1
 enum TipoDeChave {
   DEFAULT_TIPO_CHAVE = 0;
   CPF = 1;
@@ -35,13 +44,15 @@ enum TipoDeChave {
 
 }
 
+// estrutura de dados service 1
+
 enum  TipoDeConta {
   DEFAULT_TIPO_DE_CONTA = 0;
   CONTA_CORRENTE = 1;
   CONTA_POUPANCA = 2;
 
 }
-// estrutura de dados de entrada / end point cadastrar
+// estrutura de dados de entrada / end point cadastrar / service 1
 message RegistraChavePixRequest {
   string clientId = 1;
   TipoDeChave tipoDeChave = 2;
@@ -50,19 +61,19 @@ message RegistraChavePixRequest {
 
 
 }
-// estrutura de dados de saida / end pint cadastrar
+// estrutura de dados de saida / end pint cadastrar/ service 1
 message RegistraChavePixResponse {
   string clientId =1;
   string pixId = 2;
 }
 
-// estrutura de dados de entrada / end point delete
+// estrutura de dados de entrada / end point delete / service 2
 message  DeleteChavePixRequest {
   string pixId = 1;
   string identificadorItau = 2;
 
 }
-// estrutura de dados de saida / end point delete
+// estrutura de dados de saida / end point delete / service 2
 message  DeleteChavePixResponse {
   string pixId = 1;
   string identificadorItau = 2;
@@ -98,5 +109,26 @@ message CarregaChavePixResponse {
 
 }
 
+// estrutura de dados do service 4 / end point listar todos
 
+message  ListarTodasPixRequest {
+  string ClientId = 1;                       // identificador itau
+}
+
+// estrutura de dados do service 4 / end point listar todos
+
+message ListarTodasPixResponse {
+
+  message ChavePix {
+    string pixId = 1;           // id interno
+    string clientId = 2;       // identificador itau
+    string tipoDeChave = 3;
+    string tipoDaConta = 4;
+    string criadoEm = 5;
+  }
+
+  string clientId = 1;
+  repeated ChavePix chaves = 2;
+
+}
 
