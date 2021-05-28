@@ -16,5 +16,33 @@
 
 ## Projeto chave Pix treino consiste:
 
-* microsserviço responsável por fazer todo o gerenciamento das chaves Pix dos nossos clientes (usuários), além de ser o ponto central de comunicação da nossa arquitetura para busca de chaves;
+# GRPC -> Chamada de Procedimento Remoto
+* Framework da google
+
+# Caracteristicas:
+* Simple & idiomatic
+* Performant & scalable
+* Interoperable & extensible
+* Funciona em cima do http2 -> https
+* Util para microsserviços
+* Utiliza protobuf, formato binario para trafegar na rede
+
+### Protobuf
+* Uma alternativa para a serialização em JSON e XML
+* Ele faz de forma binaria
+* Desta forma, os dados ficam bem menores e compactos, e podem ser trafegados muito mais rapidamente, e com menor
+custo na rede, persistidos em discos
+
+# consumindo-endpoint-rest
+* KeyManager: microsserviço responsável por fazer todo o gerenciamento das chaves Pix dos nossos clientes (usuários), além de ser o ponto central de comunicação da nossa arquitetura para busca de chaves;
+
+## Ferramentas
+
+* Application Type: gRPC Application
+* Micronaut Version: 2.5.4
+* Java Version: 11
+* Language: Kotlin
+* Build: Gradlle Kotlin
+* Test Framework: Junit
+
 
