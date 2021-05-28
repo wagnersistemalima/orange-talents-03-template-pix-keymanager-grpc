@@ -39,7 +39,7 @@ custo na rede, persistidos em discos
 ## Ferramentas
 
 * Application Type: gRPC Application
-* Micronaut Version: 2.5.4
+* Micronaut Version: 2.5.3
 * Java Version: 11
 * Language: Kotlin
 * Build: Gradlle Kotlin
