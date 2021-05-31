@@ -4,7 +4,7 @@ micronaut:
 
 grpc:
   server:
-    port: localhost:5051
+    port: localhost:50051
 
 datasources:
   default:
