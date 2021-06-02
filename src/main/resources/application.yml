@@ -8,7 +8,7 @@ grpc:
 
 datasources:
   default:
-    url: jdbc:postgresql://localhost:5432/bd_keymanager
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/bd_keymanager}
     driverClassName: org.postgresql.Driver
     username: postgres
     password: 1234567
@@ -25,4 +25,6 @@ jpa.default.properties.hibernate.show_sql: true
 
 jpa.default.properties.hibernate.format_sql: true
 
-
+servicos:
+  ERP: ${ERP_URL:http://localhost:9091}
+  BCB: ${BCB_URL:http://localhost:8082}
